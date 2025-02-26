@@ -1,5 +1,6 @@
+import generatetoken from '../lib/token.js';
 import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; 
 import bcrypt from 'bcryptjs';
 import { User } from '../models/user.models.js';
 const signup = async () =>{
@@ -12,10 +13,25 @@ const signup = async () =>{
         if(user1){
             return res.status(400).json({message:"User already exists"});
         }
-        
-        const user = await User.create({fullname,email,password});
+        const hashedpassword = await bcrypt.hash(password,10);
+        const user = await User.create({fullname,email,password:hashedpassword});
+        if(user){
+            generatetoken(user._id,res);
+            await user.save();
+            return res.status(201).json({
+                _id:user._id,
+                fullname:user.fullname,
+                email:user.email,
+                token:generatetoken(user._id),
+                profilepic:user.profilepic
+            });
+        }
+        else{
+            return res.status(500).json({message:"Failed to create user"});
+        }
     } catch (error) {
-        
+        console.error(error);
+        res.status(500).json({message:"Server error"});
     }
 }
 
