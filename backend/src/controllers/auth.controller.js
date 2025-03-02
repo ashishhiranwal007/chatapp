@@ -42,12 +42,53 @@ const signup = async (req, res) => {
     }
 };
 
-const login = (req, res) => {
-    console.log("Login route");
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    // Validate input
+    if (!email || !password) {
+        return res.status(400).json({ message: "Please fill all the fields" });
+    }
+
+    try {
+        const user = await User.findOne({ email }); // ✅ Await added
+
+        // Check if user exists
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if password exists (Extra safety check)
+        if (!user.password) {
+            return res.status(500).json({ message: "User password is missing in the database" });
+        }
+
+        // Compare passwords
+        const isMatch = await bcrypt.compare(password, user.password); // ✅ Await added
+
+        if (!isMatch) {
+            return res.status(400).json({ message: "Invalid credentials" });
+        }
+
+        const token = await generatetoken(user._id, res);
+
+        return res.status(200).json({
+            _id: user._id,
+            fullname: user.fullname,
+            email: user.email,
+            token: token,
+            profilepic: user.profilepic
+        });
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
 };
 
+
 const logout = (req, res) => {
-    console.log("Logout route");
+    res.cookie("jwt","",{maxage:0})
+    res.status(200).json({ message: "Logged out" });
 };
 
 export { login, logout, signup };
