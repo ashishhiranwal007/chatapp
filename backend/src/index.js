@@ -1,6 +1,6 @@
 import express from 'express';
 import authroutes from "./routes/auth.routes.js"; 
-import meassageroutes from "./routes/meassage.routes.js";
+import meassageroutes from "./routes/message.routes.js";
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import dbconnect from './lib/db.js'
