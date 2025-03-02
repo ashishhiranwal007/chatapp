@@ -2,7 +2,7 @@ import generatetoken from '../lib/token.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/user.models.js';
-
+import cloundinary from '../lib/cloundianry.js';
 const signup = async (req, res) => {
     const { fullname, email, password } = req.body;
 
@@ -91,4 +91,36 @@ const logout = (req, res) => {
     res.status(200).json({ message: "Logged out" });
 };
 
-export { login, logout, signup };
+const updateProfile= async (req,res)=>{
+   try {
+    const {profilepic}  =req.body;
+    if(!profilepic){
+        return res.status(400).json({message:"Please select an image"});
+    }
+    const user_id = req.user._id
+    const uploaderresponse =  await cloundinary.uploader.upload(profilepic);
+    const updateuser = await User.findByIdAndUpdate(user_id,{profilepic:uploaderresponse.url},{new:true});
+    res.status(200).json(updateuser);
+
+   } catch (error) {
+         console.error(error);
+         res.status(500).json({message:"Server error"});
+   }
+
+}
+const checkauth =async (req,res)=>{
+    try {
+        res.json(req.user);
+    } catch (error) {
+        res.status(500).json({meassage:"not the correct auth"});
+    }
+}
+const getprofile = async(req,res)=>{
+    const profilepic =req.user.profilepic;
+    if(!profilepic){
+        res.status(500).json({meassage:"put file in it"});
+    }
+    res.json(profilepic);
+
+}
+export { login, logout, signup, updateProfile,checkauth ,getprofile};

@@ -1,5 +1,6 @@
 import express from 'express';
 import authroutes from "./routes/auth.routes.js"; 
+import meassageroutes from "./routes/meassage.routes.js";
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import dbconnect from './lib/db.js'
@@ -9,6 +10,7 @@ const app =express();
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authroutes);
+app.use("/api/meassage",meassageroutes);
 const port = process.env.PORT ;
 dbconnect().then((result) => {
     console.log("mongodb connection :"+result);
