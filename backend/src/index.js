@@ -1,11 +1,13 @@
 import express from 'express';
 import authroutes from "./routes/auth.routes.js"; 
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
 import dbconnect from './lib/db.js'
 dotenv.config();
 import mongoose from 'mongoose';
-app.use(express.json());
 const app =express();
+app.use(cookieParser());
+app.use(express.json());
 app.use("/api/auth", authroutes);
 const port = process.env.PORT ;
 dbconnect().then((result) => {
