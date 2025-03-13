@@ -11,11 +11,12 @@ import mongoose from 'mongoose';
 
 const app =express();
 app.use(
-    cors({
-      origin: "http://localhost:5001",
-      credentials: true,
-    })
-  );
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true, 
+  })
+);
+
 app.use(cookieParser());
 app.use(express.json());
 app.use("/api/auth", authroutes);

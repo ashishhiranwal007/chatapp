@@ -108,9 +108,11 @@ const updateProfile= async (req,res)=>{
    }
 
 }
-const checkauth =async (req,res)=>{
+const checkauth = async (req,res)=>{
+    
     try {
         res.json(req.user);
+
     } catch (error) {
         res.status(500).json({meassage:"not the correct auth"});
     }
