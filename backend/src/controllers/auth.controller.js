@@ -2,15 +2,15 @@ import generatetoken from '../lib/token.js';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { User } from '../models/user.models.js';
-import cloundinary from '../lib/cloundianry.js';
+import cloundinary from '../lib/cloudinary.js';
 const signup = async (req, res) => {
-    const { fullname, email, password } = req.body;
-
-    if (!fullname || !email || !password) {
+    const { fullName, email, password } = req.body;
+    try {
+    if (!fullName || !email || !password) {
         return res.status(400).json({ message: "Please fill all the fields" });
     }
 
-    try {
+   
         if (password.length < 6) {
             return res.status(400).json({ message: "Password must be at least 6 characters" });
         }
@@ -21,14 +21,14 @@ const signup = async (req, res) => {
         }
 
         const hashedpassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ fullname, email, password: hashedpassword });
+        const user = new User({ fullName, email, password: hashedpassword });
 
         if (user) {
             const token = await generatetoken(user._id, res);
             await user.save();
             return res.status(201).json({
                 _id: user._id,
-                fullname: user.fullname,
+                fullName: user.fullName,
                 email: user.email,
                 token: token, // Use generated token
                 profilepic: user.profilepic
@@ -44,13 +44,13 @@ const signup = async (req, res) => {
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-
+    try {
     // Validate input
     if (!email || !password) {
         return res.status(400).json({ message: "Please fill all the fields" });
     }
 
-    try {
+  
         const user = await User.findOne({ email }); // ✅ Await added
 
         // Check if user exists
@@ -70,11 +70,11 @@ const login = async (req, res) => {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token = await generatetoken(user._id, res);
+        const token =  generatetoken(user._id, res);
 
         return res.status(200).json({
             _id: user._id,
-            fullname: user.fullname,
+            fullName: user.fullName,
             email: user.email,
             token: token,
             profilepic: user.profilepic
@@ -87,19 +87,24 @@ const login = async (req, res) => {
 
 
 const logout = (req, res) => {
-    res.cookie("jwt","",{maxage:0})
-    res.status(200).json({ message: "Logged out" });
+    try {
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.status(200).json({ message: "Logged out successfully" });
+      } catch (error) {
+        console.log("Error in logout controller", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
 };
 
 const updateProfile= async (req,res)=>{
    try {
-    const {profilepic}  =req.body;
-    if(!profilepic){
+    const {profilePic}  =req.body;
+    if(!profilePic){
         return res.status(400).json({message:"Please select an image"});
     }
     const user_id = req.user._id
-    const uploaderresponse =  await cloundinary.uploader.upload(profilepic);
-    const updateuser = await User.findByIdAndUpdate(user_id,{profilepic:uploaderresponse.url},{new:true});
+    const uploaderresponse =  await cloundinary.uploader.upload(profilePic);
+    const updateuser = await User.findByIdAndUpdate(user_id,{profilePic:uploaderresponse.secure_url},{new:true});
     res.status(200).json(updateuser);
 
    } catch (error) {
@@ -111,18 +116,17 @@ const updateProfile= async (req,res)=>{
 const checkauth = async (req,res)=>{
     
     try {
-        res.json(req.user);
-
+        res.status(200).json(req.user);
     } catch (error) {
         res.status(500).json({meassage:"not the correct auth"});
     }
 }
 const getprofile = async(req,res)=>{
-    const profilepic =req.user.profilepic;
-    if(!profilepic){
+    const profilePic =req.user.profilePic;
+    if(!profilePic){
         res.status(500).json({meassage:"put file in it"});
     }
-    res.json(profilepic);
+    res.json(profilePic);
 
 }
 export { login, logout, signup, updateProfile,checkauth ,getprofile};

@@ -11,7 +11,7 @@ const protectroute = async (req,res,next) =>{
         if(!decoded){
             return res.status(401).json({message:"Unauthorized not matched token "})
         }
-        const user= await User.findById(decoded.userid);
+        const user= await User.findById(decoded.userId).select("-password");
         if(!user){
             return res.status(401).json({message:"Unauthorized user"})
         }

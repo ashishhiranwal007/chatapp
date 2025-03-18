@@ -6,7 +6,9 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {colors: {
+      primary: "#6667AB", // Change to your primary color
+    },},
   },
   plugins: [daisy],
 }
