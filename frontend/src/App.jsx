@@ -3,12 +3,12 @@ import Navbar from './components/Navbar.jsx';
 import { Navigate } from 'react-router-dom';
 import {  Routes, Route } from "react-router-dom";
 
-import SettingPage from './pages/SettingPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
+import SettingPage from './pages/Settingpage.jsx';
+import ProfilePage from './pages/Profilepage.jsx';
 import HomePage from './pages/Homepage.jsx';
 import LoginPage from './pages/Loginpage.jsx';
 import { SignUpPage } from './pages/Signuppage.jsx';
-import { useAuthStore } from './Store/useAuthStore.js';
+import { useAuthStore } from './store/useAuthStore.js';
 import {Loader} from 'lucide-react'
 import { Toaster } from 'react-hot-toast';
 export default function App() {
