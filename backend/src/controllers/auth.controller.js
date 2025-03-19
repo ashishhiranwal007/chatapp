@@ -45,32 +45,32 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     const { email, password } = req.body;
     try {
-    // Validate input
-    if (!email || !password) {
-        return res.status(400).json({ message: "Please fill all the fields" });
-    }
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ message: "Please fill all the fields" });
+        }
 
-  
-        const user = await User.findOne({ email }); // ✅ Await added
+        const user = await User.findOne({ email });
 
         // Check if user exists
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Check if password exists (Extra safety check)
+        // Check if password exists
         if (!user.password) {
             return res.status(500).json({ message: "User password is missing in the database" });
         }
 
         // Compare passwords
-        const isMatch = await bcrypt.compare(password, user.password); // ✅ Await added
+        const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
 
-        const token =  generatetoken(user._id, res);
+        // Add the await keyword here
+        const token = await generatetoken(user._id, res);
 
         return res.status(200).json({
             _id: user._id,

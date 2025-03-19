@@ -48,9 +48,23 @@ export const useAuthStore =create((set,get)=>({
         set({isLoggingIn:false});
       }
     },
+    updateProfile:async(data)=>{
+      set({isUpdatingProfile:true});
+      try{
+        const res =await axiosInstance.post("/auth/update-profile",data);
+        set({authUser:res.data});
+        toast.success("Profile updated successfully");
+      }
+      catch(error){
+        toast.error(error.response.data.message);
+      }
+      finally{
+        set({isUpdatingProfile:false});
+      }
+    },
     logout:async ()=>{
       try {
-         await axiosInstance.get("/auth/logout");
+         await axiosInstance.post("/auth/logout");
          set({authUser:null});
         toast.success("Logged out successfully");
       } catch (error) {
